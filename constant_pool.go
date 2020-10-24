@@ -8,14 +8,14 @@ import (
 type ConstantPool struct {
 	buffer    *Buffer
 	lastIndex uint16
-	Cache     map[string]uint16
+	cache     map[string]uint16
 }
 
 func CreateConstantInfo() *ConstantPool {
 	return &ConstantPool{
 		buffer:    CreateBuffer(),
 		lastIndex: 0,
-		Cache:     make(map[string]uint16, 0),
+		cache:     make(map[string]uint16, 0),
 	}
 }
 
@@ -83,12 +83,12 @@ func (constPool *ConstantPool) AddConst(tag uint8, values ...interface{}) uint16
 	}
 
 	hex := fmt.Sprintf("%x", bytes)
-	if index, found := constPool.Cache[hex]; found {
+	if index, found := constPool.cache[hex]; found {
 		return index
 	}
 
 	constPool.lastIndex++
-	constPool.Cache[hex] = constPool.lastIndex
+	constPool.cache[hex] = constPool.lastIndex
 	constPool.buffer.Write(bytes)
 
 	if tag == Constant_Long || tag == Constant_Double {

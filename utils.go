@@ -2,10 +2,39 @@ package bytecode
 
 import (
 	"fmt"
-	"log"
 )
 
-const debugMode = false
+func countParameters(descriptor string) uint16 {
+	parameters := 0
+	foundReference := false
+
+	for _, char := range descriptor {
+		if char == '(' || char == '[' {
+			continue
+		}
+
+		if char == ')' {
+			break
+		}
+
+		if char == 'L' {
+			foundReference = true
+		}
+
+		if foundReference {
+			if char == ';' {
+				foundReference = false
+				parameters++
+			}
+
+			continue
+		}
+
+		parameters++
+	}
+
+	return uint16(parameters)
+}
 
 func Ternary(expresion bool, whenTrue interface{}, whenFalse interface{}) interface{} {
 	if expresion {
@@ -16,17 +45,5 @@ func Ternary(expresion bool, whenTrue interface{}, whenFalse interface{}) interf
 }
 
 func Log(message string, values ...interface{}) {
-	fmt.Printf(message + "\n", values...)
-}
-
-func Debug(message string, values ...interface{}) {
-	if debugMode {
-		fmt.Printf(message + "\n", values...)
-	}
-}
-
-func Check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Printf(message+"\n", values...)
 }

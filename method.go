@@ -6,13 +6,13 @@ import (
 )
 
 type Method struct {
-	bytecode   *Bytecode
+	class      *Class
 	Name       string
 	Descriptor string
 
 	AccessFlags     uint16
 	NameIndex       uint16
-	descriptorIndex uint16
+	DescriptorIndex uint16
 	attributesCount uint16
 
 	// Code attribute
@@ -20,13 +20,13 @@ type Method struct {
 	codeAttributeLength    uint32
 	maxStack               uint16
 	maxLocals              uint16
-	codeBytes            *Buffer
-	exceptionTableLength uint16
-	codeAttributesCount  uint16
+	codeBytes              *Buffer
+	exceptionTableLength   uint16
+	codeAttributesCount    uint16
 }
 
 func (method *Method) GetReference() uint16 {
-	return method.bytecode.ConstPool.AddMethodRef(method.bytecode.ClassName, method.Name, method.Descriptor)
+	return method.class.ConstPool.AddMethodRef(method.class.ClassName, method.Name, method.Descriptor)
 }
 
 func (method *Method) AddFieldInstruction(instruction Instruction, class string, name string, descriptor string) {
@@ -34,7 +34,7 @@ func (method *Method) AddFieldInstruction(instruction Instruction, class string,
 		panic("AddFieldInstruction can be used only for instructions that need FieldRef as parameter")
 	}
 
-	method.AddInstruction(instruction, method.bytecode.ConstPool.AddFieldRef(class, name, descriptor))
+	method.AddInstruction(instruction, method.class.ConstPool.AddFieldRef(class, name, descriptor))
 }
 
 func (method *Method) AddInvokeInstruction(instruction Instruction, class string, name string, descriptor string) {
@@ -42,7 +42,7 @@ func (method *Method) AddInvokeInstruction(instruction Instruction, class string
 		panic("AddInvokeInstruction can be used only for invoke instructions")
 	}
 
-	method.AddInstruction(instruction, method.bytecode.ConstPool.AddMethodRef(class, name, descriptor))
+	method.AddInstruction(instruction, method.class.ConstPool.AddMethodRef(class, name, descriptor))
 }
 
 func (method *Method) AddInstruction(instruction Instruction, parameters ...interface{}) {
@@ -67,12 +67,8 @@ func (method *Method) toBytes() []byte {
 	buffer := CreateBuffer()
 	buffer.Write(method.AccessFlags)
 	buffer.Write(method.NameIndex)
-	buffer.Write(method.descriptorIndex)
+	buffer.Write(method.DescriptorIndex)
 	buffer.Write(method.attributesCount)
-
-	if method.AccessFlags&Flag_Static != Flag_Static {
-		method.maxLocals++
-	}
 
 	// MaxStack(u2) + MaxLocals(u2) + CodeLength(u4) + len(CodeBytes) + ExceptionTableLength(u2) + CodeAttributesCount(u2)
 	method.codeAttributeLength = uint32(2 + 2 + 4 + len(method.codeBytes.bytes) + 2 + 2)
