@@ -21,6 +21,12 @@ func CreateConstantInfo() *ConstantPool {
 
 func (constPool *ConstantPool) AddAuto(data interface{}) uint16 {
 	switch value := data.(type) {
+	case int8:
+		return constPool.AddNumber(int(value))
+	case int16:
+		return constPool.AddNumber(int(value))
+	case int32:
+		return constPool.AddNumber(int(value))
 	case int:
 		return constPool.AddNumber(value)
 	case int64:
@@ -30,10 +36,10 @@ func (constPool *ConstantPool) AddAuto(data interface{}) uint16 {
 	case float64:
 		return constPool.AddDouble(value)
 	case string:
-		panic("string can't be added to const pool via AddAuto, it can be String or UTF8")
-	default:
-		panic("Can't add unknown type to const pool: " + reflect.TypeOf(data).Name())
+		return constPool.AddString(value)
 	}
+
+	panic("Can't add unknown type to const pool: " + reflect.TypeOf(data).Name())
 }
 
 func (constPool *ConstantPool) AddNumber(value int) uint16 {

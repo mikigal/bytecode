@@ -64,6 +64,7 @@ func (class *Class) AddMethod(accessFlags uint16, name string, descriptor string
 		class:                  class,
 		Name:                   name,
 		Descriptor:             descriptor,
+		LocalVars:              make(map[uint8]JavaType, 0),
 		AccessFlags:            accessFlags,
 		NameIndex:              class.ConstPool.AddUtf8(name),
 		DescriptorIndex:        class.ConstPool.AddUtf8(descriptor),

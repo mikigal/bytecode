@@ -60,17 +60,6 @@ const Attribute_RuntimeVisibleParameterAnnotations string = "RuntimeVisibleParam
 const Attribute_RuntimeInvisibleParameterAnnotations string = "RuntimeInvisibleParameterAnnotations"
 const Attribute_AnnotationDefault string = "AnnotationDefault"
 
-const Type_Byte = "B"
-const Type_Char = "C"
-const Type_Double = "D"
-const Type_Float = "F"
-const Type_Int = "I"
-const Type_Long = "J"
-const Type_Reference = "L"
-const Type_Short = "S"
-const Type_Boolean = "Z"
-const Type_Array = "["
-
 type Instruction struct {
 	Name            string
 	Value           u1
