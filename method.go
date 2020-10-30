@@ -15,6 +15,7 @@ type Method struct {
 	NameIndex       uint16
 	DescriptorIndex uint16
 	attributesCount uint16
+	attributes      *Buffer
 
 	// Code attribute
 	codeAttributeNameIndex uint16
@@ -133,23 +134,24 @@ func (method *Method) AddLocalVar(data interface{}) uint8 {
 }
 
 func (method *Method) toBytes() []byte {
+	codeBuffer := CreateBuffer()
+	codeBuffer.Write(method.maxStack)
+	codeBuffer.Write(method.maxLocals)
+	codeBuffer.Write(uint32(len(method.codeBytes.bytes)))
+	codeBuffer.Write(method.codeBytes.bytes)
+	codeBuffer.Write(method.exceptionTableLength)
+	codeBuffer.Write(method.codeAttributesCount)
+	method.codeAttributeLength = uint32(len(codeBuffer.bytes))
+
 	buffer := CreateBuffer()
 	buffer.Write(method.AccessFlags)
 	buffer.Write(method.NameIndex)
 	buffer.Write(method.DescriptorIndex)
 	buffer.Write(method.attributesCount)
-
-	// MaxStack(u2) + MaxLocals(u2) + CodeLength(u4) + len(CodeBytes) + ExceptionTableLength(u2) + CodeAttributesCount(u2)
-	method.codeAttributeLength = uint32(2 + 2 + 4 + len(method.codeBytes.bytes) + 2 + 2)
-
+	buffer.Write(method.attributes.bytes)
 	buffer.Write(method.codeAttributeNameIndex)
 	buffer.Write(method.codeAttributeLength)
-	buffer.Write(method.maxStack)
-	buffer.Write(method.maxLocals)
-	buffer.Write(uint32(len(method.codeBytes.bytes)))
-	buffer.Write(method.codeBytes.bytes)
-	buffer.Write(method.exceptionTableLength)
-	buffer.Write(method.codeAttributesCount)
+	buffer.Write(codeBuffer.bytes)
 
 	return buffer.bytes
 }

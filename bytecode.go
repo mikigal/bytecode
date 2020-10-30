@@ -69,6 +69,7 @@ func (class *Class) AddMethod(accessFlags uint16, name string, descriptor string
 		NameIndex:              class.ConstPool.AddUtf8(name),
 		DescriptorIndex:        class.ConstPool.AddUtf8(descriptor),
 		attributesCount:        1,
+		attributes:             CreateBuffer(),
 		codeAttributeNameIndex: class.ConstPool.AddUtf8(Attribute_Code),
 		codeAttributeLength:    0,
 		maxStack:               maxStack,
